@@ -1,0 +1,125 @@
+import 'package:collection/collection.dart';
+
+class Book {
+  String title;
+  String author;
+  String isbn;
+  int copies;
+
+  Book({required this.title, required this.author, required this.isbn, required this.copies});
+
+  void borrowBook() {
+    if (copies > 0) {
+      copies--;
+      print("ยืมหนังสือ '$title' สำเร็จ");
+    } else {
+      print("หนังสือ '$title' ไม่มีสำเนาให้ยืม");
+    }
+  }
+
+  void returnBook() {
+    copies++;
+    print("คืนหนังสือ '$title' สำเร็จ");
+  }
+}
+
+class Member {
+  String name;
+  String memberId;
+  List<Book> borrowedBooks = [];
+
+  Member({required this.name, required this.memberId});
+
+  void borrowBook(Book book) {
+    if (book.copies > 0) {
+      book.copies--;
+      borrowedBooks.add(book);
+      print("$name ยืมหนังสือ '${book.title}' สำเร็จ");
+    } else {
+      print("หนังสือ '${book.title}' ไม่มีสำเนาให้ยืม");
+    }
+  }
+
+  void returnBook(Book book) {
+    if (borrowedBooks.contains(book)) {
+      borrowedBooks.remove(book);
+      book.copies++;
+      print("$name คืนหนังสือ '${book.title}' สำเร็จ");
+    } else {
+      print("$name ไม่ได้ยืมหนังสือ '${book.title}'");
+    }
+  }
+}
+
+class Library {
+  List<Book> books = [];
+  List<Member> members = [];
+
+  Library() {
+    books = [];
+    members = [];
+  }
+
+  void addBook(Book book) {
+    books.add(book);
+    print("เพิ่มหนังสือ '${book.title}' สำเร็จ");
+  }
+
+  void removeBook(Book book) {
+    if (books.contains(book)) {
+      books.remove(book);
+      print("ลบหนังสือ '${book.title}' สำเร็จ");
+    } else {
+      print("หนังสือ '${book.title}' ไม่ได้อยู่ในห้องสมุด");
+    }
+  }
+
+  void registerMember(Member member) {
+    members.add(member);
+    print("ลงทะเบียนสมาชิก '${member.name}' สำเร็จ");
+  }
+
+  Member? getMember(String memberId) {
+    return members.firstWhereOrNull((member) => member.memberId == memberId);
+  }
+
+  Book? getBook(String isbn) {
+    return books.firstWhereOrNull((book) => book.isbn == isbn);
+  }
+
+  void borrowBook(String memberId, String isbn) {
+    Member? member = getMember(memberId);
+    Book? book = getBook(isbn);
+    if (member != null && book != null) {
+      member.borrowBook(book);
+    } else {
+      print("ไม่สามารถยืมหนังสือได้ กรุณาตรวจสอบข้อมูล");
+    }
+  }
+
+  void returnBook(String memberId, String isbn) {
+    Member? member = getMember(memberId);
+    Book? book = getBook(isbn);
+    if (member != null && book != null) {
+      member.returnBook(book);
+    } else {
+      print("ไม่สามารถคืนหนังสือได้ กรุณาตรวจสอบข้อมูล");
+    }
+  }
+}
+
+void main() {
+  Library library = Library();
+
+  Book book1 = Book(title: 'Dart Programming', author: 'Author 1', isbn: '111', copies: 5);
+  Book book2 = Book(title: 'Flutter Development', author: 'Author 2', isbn: '222', copies: 3);
+
+  library.addBook(book1);
+  library.addBook(book2);
+
+  Member member1 = Member(name: 'John Doe', memberId: 'M001');
+  library.registerMember(member1);
+
+  library.borrowBook('M001', '111');
+  library.returnBook('M001', '111');
+}
